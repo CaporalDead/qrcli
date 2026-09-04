@@ -68,10 +68,50 @@ func TestRun(t *testing.T) {
 			wantInStderr: "invalid error correction level",
 		},
 		{
-			name:         "content too long for a QR code",
+			// Beyond the capacity of ANY QR code: rejected as a usage
+			// error before encoding (issue #22).
+			name:         "payload beyond any QR capacity",
 			args:         []string{"-l", "H", strings.Repeat("a", 3000)},
+			wantCode:     2,
+			wantInStderr: "exceeds the maximum QR capacity",
+		},
+		{
+			// Fits a QR in principle, but not at level H: still the
+			// encoder's call, exit 1.
+			name:         "payload too long for the chosen level",
+			args:         []string{"-l", "H", strings.Repeat("a", 2000)},
 			wantCode:     1,
 			wantInStderr: "qrcli:",
+		},
+		{
+			name:         "stdin at exact capacity",
+			args:         []string{"-l", "L"},
+			stdin:        strings.Repeat("a", 2953),
+			wantCode:     0,
+			wantInStdout: "█",
+		},
+		{
+			name:         "stdin at exact capacity with trailing newline",
+			args:         []string{"-l", "L"},
+			stdin:        strings.Repeat("a", 2953) + "\n",
+			wantCode:     0,
+			wantInStdout: "█",
+		},
+		{
+			name:         "stdin one byte over capacity",
+			args:         nil,
+			stdin:        strings.Repeat("a", 2954),
+			wantCode:     2,
+			wantInStderr: "exceeds the maximum QR capacity",
+		},
+		{
+			// The read is bounded: a huge pipe fails fast without being
+			// buffered (issue #22 measured 787 MB RSS before the fix).
+			name:         "huge stdin fails fast",
+			args:         nil,
+			stdin:        strings.Repeat("a", 100_000),
+			wantCode:     2,
+			wantInStderr: "exceeds the maximum QR capacity",
 		},
 		{
 			name:         "happy path with argument",

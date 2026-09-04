@@ -7,6 +7,19 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 ## [Unreleased]
 
+### Security
+
+- Standard-input ingestion is now bounded: streams beyond the maximum QR
+  capacity (2953 bytes) fail fast with constant memory, instead of being
+  buffered whole (a 200 MB pipe was measured at 787 MB peak RSS) before the
+  encoder rejected them ([#22]).
+
+### Changed
+
+- Inputs larger than 2953 bytes — impossible for any QR code — now exit 2
+  (usage error) with a clear message; inputs that fit a QR but not the chosen
+  error-correction level still exit 1 ([#22]).
+
 ## [0.2.0] - 2026-09-05
 
 ### Added
@@ -43,6 +56,7 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 [#1]: https://github.com/CaporalDead/qrcli/issues/1
 [#15]: https://github.com/CaporalDead/qrcli/issues/15
+[#22]: https://github.com/CaporalDead/qrcli/issues/22
 [#17]: https://github.com/CaporalDead/qrcli/issues/17
 [#2]: https://github.com/CaporalDead/qrcli/issues/2
 [#3]: https://github.com/CaporalDead/qrcli/issues/3
