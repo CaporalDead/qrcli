@@ -41,6 +41,23 @@ func TestWiFiEncode(t *testing.T) {
 			in:   WiFi{SSID: `a;b:c"d,e\f`, Password: "p;q"},
 			want: `WIFI:T:WPA;S:a\;b\:c\"d\,e\\f;P:p\;q;;`,
 		},
+		{
+			// ZXing note: unquoted all-hex values may be read as
+			// hex-encoded by some parsers — force string interpretation.
+			name: "hex-only ssid is double-quoted",
+			in:   WiFi{SSID: "CAFE12"},
+			want: `WIFI:T:nopass;S:"CAFE12";;`,
+		},
+		{
+			name: "hex-only password is double-quoted",
+			in:   WiFi{SSID: "Home", Password: "deadbeef"},
+			want: `WIFI:T:WPA;S:Home;P:"deadbeef";;`,
+		},
+		{
+			name: "almost-hex value stays bare",
+			in:   WiFi{SSID: "CAFE12x"},
+			want: "WIFI:T:nopass;S:CAFE12x;;",
+		},
 	}
 
 	for _, tt := range tests {
@@ -117,10 +134,16 @@ func TestVCardEncode(t *testing.T) {
 			want: "BEGIN:VCARD\nVERSION:3.0\nN:Ada;\nFN:Ada\nEND:VCARD",
 		},
 		{
+			// A single comma triggers the explicit "Family, Given" split.
 			name: "reserved characters are escaped, colon is not",
 			in:   VCard{Name: "A; B, C", URL: "https://example.org/a,b"},
-			want: "BEGIN:VCARD\nVERSION:3.0\nN:C;A\\; B\\,\nFN:A\\; B\\, C\n" +
+			want: "BEGIN:VCARD\nVERSION:3.0\nN:A\\; B;C\nFN:A\\; B\\, C\n" +
 				"URL:https://example.org/a\\,b\nEND:VCARD",
+		},
+		{
+			name: "explicit Family, Given convention",
+			in:   VCard{Name: "Lovelace, Ada"},
+			want: "BEGIN:VCARD\nVERSION:3.0\nN:Lovelace;Ada\nFN:Lovelace\\, Ada\nEND:VCARD",
 		},
 		{
 			name: "raw newline in a field becomes a literal backslash-n",
@@ -157,6 +180,11 @@ func TestSplitName(t *testing.T) {
 		{"Ada", "Ada", ""},
 		{"Ada Lovelace", "Lovelace", "Ada"},
 		{"Jean Luc Picard", "Picard", "Jean Luc"},
+		{"Lovelace, Ada", "Lovelace", "Ada"},
+		{"de La Fontaine , Jean", "de La Fontaine", "Jean"},
+		// Degenerate commas fall back to the last-word heuristic.
+		{"Ada,", "Ada,", ""},
+		{"a, b, c", "c", "a, b,"},
 	}
 	for _, tt := range tests {
 		family, given := splitName(tt.full)

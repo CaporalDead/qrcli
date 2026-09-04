@@ -63,11 +63,11 @@ func (w WiFi) Encode() (string, error) {
 	b.WriteString("WIFI:T:")
 	b.WriteString(security)
 	b.WriteString(";S:")
-	b.WriteString(wifiEscaper.Replace(w.SSID))
+	b.WriteString(wifiValue(w.SSID))
 	b.WriteString(";")
 	if w.Password != "" {
 		b.WriteString("P:")
-		b.WriteString(wifiEscaper.Replace(w.Password))
+		b.WriteString(wifiValue(w.Password))
 		b.WriteString(";")
 	}
 	if w.Hidden {
@@ -75,6 +75,32 @@ func (w WiFi) Encode() (string, error) {
 	}
 	b.WriteString(";")
 	return b.String(), nil
+}
+
+// wifiValue escapes a WIFI: field value. Values made solely of hex digits
+// are additionally double-quoted: the de-facto spec (ZXing) warns that
+// unquoted all-hex values may be interpreted as hex-encoded by some
+// parsers (issue #25).
+func wifiValue(s string) string {
+	if isHexOnly(s) {
+		return `"` + s + `"`
+	}
+	return wifiEscaper.Replace(s)
+}
+
+// isHexOnly reports whether s is non-empty and contains only hex digits.
+func isHexOnly(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		switch {
+		case '0' <= r && r <= '9', 'a' <= r && r <= 'f', 'A' <= r && r <= 'F':
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 // VCard describes a contact card encoded as vCard 3.0 — chosen over the
@@ -129,7 +155,16 @@ func (v VCard) Encode() (string, error) {
 }
 
 // splitName maps a display name onto vCard's structured N property.
+// A single comma selects the explicit "Family, Given" convention; otherwise
+// the last word is taken as the family name (issue #25).
 func splitName(full string) (family, given string) {
+	if strings.Count(full, ",") == 1 {
+		left, right, _ := strings.Cut(full, ",")
+		family, given = strings.TrimSpace(left), strings.TrimSpace(right)
+		if family != "" && given != "" {
+			return family, given
+		}
+	}
 	fields := strings.Fields(full)
 	if len(fields) == 1 {
 		return fields[0], ""

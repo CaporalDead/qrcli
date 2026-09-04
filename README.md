@@ -107,7 +107,10 @@ $ qrcli vcard --name "Ada Lovelace" --tel "+44 20 7946 0958" \
 ```
 
 `qrcli wifi -h` / `qrcli vcard -h` list all fields. Rendering options
-(`-l`, `-i`, `-a`) go **after** the subcommand. The words `wifi` and `vcard`
+(`-l`, `-i`, `-a`) go **after** the subcommand. For contact names, the last
+word is taken as the family name — write `--name "Family, Given"` to set it
+explicitly. Hex-only SSIDs/passwords are automatically double-quoted so
+scanners don't misread them as hex-encoded. The words `wifi` and `vcard`
 are reserved as first argument — to encode those literal words, pipe them
 instead: `echo -n "wifi" | qrcli`.
 
