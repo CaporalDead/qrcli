@@ -142,6 +142,10 @@ The whole tool is ~200 lines on top of a single dependency
 Architecture, diagrams and the error-handling contract live in
 [docs/architecture.md](docs/architecture.md).
 
+Audit snapshots (methodology + measured results) live in
+[docs/audits/](docs/audits/); latest: [2026-09-05](docs/audits/2026-09-05.md) —
+including an end-to-end scan proof of the rendered codes.
+
 Every non-obvious choice is recorded in the issue tracker as an ADR — browse the
 [`decision` label](https://github.com/CaporalDead/qrcli/issues?q=label%3Adecision)
 for the full log (language choice, rendering strategy, quiet zone size, …), and the
