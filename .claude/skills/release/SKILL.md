@@ -12,6 +12,11 @@ Map Conventional Commits to the bump: any `feat!`/`BREAKING CHANGE` → MAJOR,
 else any `feat` → MINOR, else any `fix` → PATCH. Only `docs`/`ci`/`chore`/`test`
 → no release needed; stop and say so.
 
+**Then cross-check the CHANGELOG**: commit types under-capture behavior.
+Any entry under *Unreleased → Changed* (an observable change to flags, exit
+codes, or output bytes for the same input) raises the bump to at least
+MINOR, even if every commit says `fix` (precedent: v0.3.0).
+
 ## 2. Preflight (on a PR, not on main)
 
 - [ ] `gh run list --branch main --limit 1` → latest CI on main is green.

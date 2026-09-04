@@ -7,6 +7,8 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-05
+
 ### Fixed
 
 - `--version` now reports the real module version for
@@ -79,6 +81,7 @@ CLI surface: flags, arguments, exit codes and the output contract.
 [#2]: https://github.com/CaporalDead/qrcli/issues/2
 [#3]: https://github.com/CaporalDead/qrcli/issues/3
 [#4]: https://github.com/CaporalDead/qrcli/issues/4
-[Unreleased]: https://github.com/CaporalDead/qrcli/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/CaporalDead/qrcli/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/CaporalDead/qrcli/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/CaporalDead/qrcli/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/CaporalDead/qrcli/releases/tag/v0.1.0
