@@ -34,6 +34,7 @@ Usage:
 Options:
   -l, --level L|M|Q|H  error correction level (default M)
   -i, --invert         invert colors, for light terminal backgrounds
+  -a, --ascii          pure-ASCII output, for terminals without Unicode blocks
   -v, --version        print version and exit
   -h, --help           show this help
 
@@ -59,12 +60,15 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	var (
 		level       string
 		invert      bool
+		ascii       bool
 		showVersion bool
 	)
 	fs.StringVar(&level, "l", "M", "error correction level")
 	fs.StringVar(&level, "level", "M", "error correction level")
 	fs.BoolVar(&invert, "i", false, "invert colors")
 	fs.BoolVar(&invert, "invert", false, "invert colors")
+	fs.BoolVar(&ascii, "a", false, "pure-ASCII output")
+	fs.BoolVar(&ascii, "ascii", false, "pure-ASCII output")
 	fs.BoolVar(&showVersion, "v", false, "print version")
 	fs.BoolVar(&showVersion, "version", false, "print version")
 
@@ -101,10 +105,12 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	// The renderer draws its own, smaller quiet zone.
 	code.DisableBorder = true
 
-	fmt.Fprint(stdout, render.Terminal(code.Bitmap(), render.Options{
-		Invert:    invert,
-		QuietZone: quietZone,
-	}))
+	opts := render.Options{Invert: invert, QuietZone: quietZone}
+	if ascii {
+		fmt.Fprint(stdout, render.ASCII(code.Bitmap(), opts))
+	} else {
+		fmt.Fprint(stdout, render.Terminal(code.Bitmap(), opts))
+	}
 	return 0
 }
 

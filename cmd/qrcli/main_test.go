@@ -110,6 +110,43 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestASCIIMode(t *testing.T) {
+	code, out, _ := exec(t, []string{"-a", "hello"}, "")
+	if code != 0 {
+		t.Fatalf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "#") {
+		t.Error("ascii output should contain '#'")
+	}
+	for _, r := range out {
+		if r > 127 {
+			t.Fatalf("ascii output contains non-ASCII rune %q", r)
+		}
+	}
+	// One row per module, two columns per module: "hello" is a v1 QR
+	// (21 modules), so 25 lines of 50 chars with the quiet zone.
+	lines := strings.Split(strings.TrimSuffix(out, "\n"), "\n")
+	if len(lines) != 25 {
+		t.Errorf("got %d lines, want 25", len(lines))
+	}
+	for i, line := range lines {
+		if len(line) != 50 {
+			t.Errorf("line %d is %d chars wide, want 50", i, len(line))
+		}
+	}
+}
+
+func TestASCIIComposesWithInvert(t *testing.T) {
+	_, normal, _ := exec(t, []string{"-a", "hello"}, "")
+	_, inverted, _ := exec(t, []string{"-a", "-i", "hello"}, "")
+	if normal == inverted {
+		t.Fatal("inverted ascii output should differ from normal ascii output")
+	}
+	if utf8.RuneCountInString(normal) != utf8.RuneCountInString(inverted) {
+		t.Error("invert must not change ascii output dimensions")
+	}
+}
+
 func TestStdinMatchesArgument(t *testing.T) {
 	// Piping the payload and passing it as an argument must produce the
 	// exact same QR code; the trailing newline of the pipe is stripped.
