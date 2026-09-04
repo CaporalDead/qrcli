@@ -78,3 +78,8 @@ This repo treats GitHub as its long-term memory:
 Step-by-step runbooks live in `.claude/skills/`:
 - `release` — how to cut a semver release end to end.
 - `document-decision` — how to record an ADR issue properly.
+- `go-develop` — the Go development loop: purity rules, testing patterns,
+  quality gate, shipping conventions.
+- `add-subcommand` — add a payload helper (wifi/vcard-style) end to end.
+- `bump-deps` — module/action/toolchain bumps: vendorHash dance, held-merge
+  strategy for release-only actions.
