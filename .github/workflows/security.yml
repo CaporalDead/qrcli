@@ -1,0 +1,40 @@
+name: Security
+
+# Weekly lane (issue #23): the dependency tree changes rarely, but the
+# vulnerability database changes weekly — and the fuzz corpus is cheap to
+# re-shake. workflow_dispatch allows on-demand runs.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: go.mod
+      - run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+  fuzz-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: go.mod
+      - name: fuzz all targets (10s each)
+        run: |
+          go test -run='^$' -fuzz=FuzzRenderers -fuzztime=10s ./internal/render
+          go test -run='^$' -fuzz=FuzzEncoders -fuzztime=10s ./internal/payload
+          go test -run='^$' -fuzz=FuzzRun -fuzztime=10s ./cmd/qrcli

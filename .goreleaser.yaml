@@ -23,6 +23,11 @@ archives:
 checksum:
   name_template: checksums.txt
 
+# One SPDX SBOM per archive, generated with syft (installed by the release
+# workflow) and uploaded as release assets (issue #23).
+sboms:
+  - artifacts: archive
+
 changelog:
   sort: asc
   filters:
