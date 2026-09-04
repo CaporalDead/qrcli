@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	qrcode "github.com/skip2/go-qrcode"
@@ -137,7 +138,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	}
 
 	if showVersion {
-		fmt.Fprintf(stdout, "qrcli %s\n", version)
+		fmt.Fprintf(stdout, "qrcli %s\n", resolveVersion())
 		return 0
 	}
 
@@ -248,6 +249,22 @@ func newFlagSet(name, usageText string, stderr io.Writer) *flag.FlagSet {
 
 func isSubcommand(s string) bool {
 	return s == "wifi" || s == "vcard"
+}
+
+// resolveVersion prefers the ldflags-stamped version (release binaries,
+// Makefile, flake) and falls back to the module version Go embeds in
+// `go install pkg@version` builds, which bypass ldflags entirely
+// (issue #26). Plain source builds still report "dev".
+func resolveVersion() string {
+	if version != "dev" {
+		return version
+	}
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if v := info.Main.Version; v != "" && v != "(devel)" {
+			return v
+		}
+	}
+	return version
 }
 
 // emit renders an already-built payload — the shared tail of the raw

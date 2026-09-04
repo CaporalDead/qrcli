@@ -325,6 +325,21 @@ func TestOutputGeometry(t *testing.T) {
 	}
 }
 
+func TestResolveVersion(t *testing.T) {
+	// Test binaries carry no usable module version, so the ldflags
+	// default must win in both directions.
+	if got := resolveVersion(); got != "dev" {
+		t.Errorf("resolveVersion() in tests = %q, want %q", got, "dev")
+	}
+
+	old := version
+	defer func() { version = old }()
+	version = "1.2.3"
+	if got := resolveVersion(); got != "1.2.3" {
+		t.Errorf("resolveVersion() with stamped version = %q, want %q", got, "1.2.3")
+	}
+}
+
 func TestParseLevel(t *testing.T) {
 	for _, valid := range []string{"L", "M", "Q", "H", "l", "m", "q", "h"} {
 		if _, err := parseLevel(valid); err != nil {
