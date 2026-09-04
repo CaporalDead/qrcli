@@ -24,7 +24,7 @@ flowchart LR
     end
 
     subgraph internal [internal/render]
-        R["Terminal(bitmap, opts)<br/>half-block renderer<br/>pure function"]
+        R["Terminal / ASCII (bitmap, opts)<br/>pure renderers over a<br/>shared grid/polarity core"]
     end
 
     O[(stdout<br/>plain UTF-8)]
@@ -79,10 +79,17 @@ blocks so the code reads dark-on-light on dark terminals; `--invert` flips the
 mapping for light terminals. The renderer adds its own 2-module quiet zone
 (the library border is disabled). Full rationale: [#2](https://github.com/CaporalDead/qrcli/issues/2).
 
+`--ascii` selects a second renderer for terminals without Unicode block
+glyphs: `##` per lit module, one row per module, pure 7-bit output — twice as
+large in both directions. Both renderers share the same quiet-zone/polarity
+core (`grid`), so `--invert` behaves identically in either mode. Rationale:
+[#15](https://github.com/CaporalDead/qrcli/issues/15).
+
 Properties relied on by tests:
 
 - output is deterministic for a given (payload, level, options) triple;
-- every line has the same rune width (`size + 2 × quietZone`);
+- every line has the same rune width (`size + 2 × quietZone` for half-blocks,
+  doubled in ASCII mode);
 - inverting changes glyphs but never dimensions (**rune** count, not bytes —
   see the pitfall in [PR #7](https://github.com/CaporalDead/qrcli/pull/7));
 - no ANSI escape sequences anywhere: output survives pipes, redirects, CI logs.
@@ -126,4 +133,5 @@ The issue tracker is the source of truth; this table is just the map.
 | Half-block rendering, polarity default, quiet zone = 2 | [#2](https://github.com/CaporalDead/qrcli/issues/2) |
 | CI matrix, GoReleaser, SemVer & Conventional Commits policy | [#3](https://github.com/CaporalDead/qrcli/issues/3) |
 | Nix flake, vendorHash & git-tracked-files pitfalls | [#4](https://github.com/CaporalDead/qrcli/issues/4), [PR #13](https://github.com/CaporalDead/qrcli/pull/13) |
-| Rejected/parked ideas (ascii mode, image export, helpers…) | [#5](https://github.com/CaporalDead/qrcli/issues/5) |
+| `--ascii` fallback renderer (`##`, graduated from the backlog) | [#15](https://github.com/CaporalDead/qrcli/issues/15) |
+| Rejected/parked ideas (image export, payload helpers…) | [#5](https://github.com/CaporalDead/qrcli/issues/5) |

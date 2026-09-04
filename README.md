@@ -73,6 +73,7 @@ qrcli [options] <text>
 
   -l, --level L|M|Q|H  error correction level (default M)
   -i, --invert         invert colors, for light terminal backgrounds
+  -a, --ascii          pure-ASCII output, for terminals without Unicode blocks
   -v, --version        print version and exit
   -h, --help           show this help
 ```
@@ -85,6 +86,7 @@ $ echo -n "some secret" | qrcli                  # pipe from stdin
 $ qrcli -l H "survives 30% damage"               # highest error correction
 $ qrcli -i "hello"                               # on a light terminal theme
 $ qrcli "WIFI:T:WPA;S:MyNetwork;P:hunter2;;"     # Wi-Fi credentials
+$ qrcli -a "hello"                               # 7-bit ASCII (##), no Unicode
 $ qrcli -- "-starts-with-a-dash"                 # payload starting with '-'
 ```
 
@@ -105,8 +107,10 @@ unreadable and still scan.
 - **The code doesn't scan on a light terminal** → use `-i`. The default polarity
   is tuned for dark backgrounds (see the
   [rendering decision](https://github.com/CaporalDead/qrcli/issues/2)).
-- **Mangled characters on Windows** → use Windows Terminal, or run `chcp 65001`
-  in legacy consoles; output is plain UTF-8.
+- **Mangled characters** (legacy `cmd.exe`, serial console, exotic fonts) → use
+  `-a/--ascii` for pure 7-bit output, or switch to a UTF-8 terminal
+  (`chcp 65001` on legacy Windows consoles). Note that ASCII mode is twice as
+  large in both directions (a small QR needs 50 columns).
 - **Huge QR overflows the terminal** → lower the error correction (`-l L`) or
   shorten the payload (URL shortener); a QR code's size grows with content.
 
