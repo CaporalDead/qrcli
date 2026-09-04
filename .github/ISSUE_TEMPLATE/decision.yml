@@ -1,0 +1,40 @@
+name: "Decision (ADR)"
+description: "Record a design decision: context, options, outcome. The issue tracker is the project's decision log."
+labels: ["decision"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the existing [decision log](https://github.com/CaporalDead/qrcli/issues?q=label%3Adecision+)
+        first. Superseding a settled decision? Cross-link it explicitly.
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: The forces and constraints. Describe the problem, not the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options considered
+      description: Honest pros/cons for each — including the boring/default option.
+      placeholder: |
+        | Option | Pros | Cons |
+        |---|---|---|
+    validations:
+      required: true
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision
+      description: One clear sentence, bolded.
+    validations:
+      required: true
+  - type: textarea
+    id: consequences
+    attributes:
+      label: Consequences
+      description: What becomes easier, what becomes harder, what we knowingly accept.
+    validations:
+      required: true

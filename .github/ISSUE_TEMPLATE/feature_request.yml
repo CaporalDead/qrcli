@@ -1,0 +1,28 @@
+name: "Feature request"
+description: "Propose a capability"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Heads-up: the product statement is **console-only, one static binary,
+        minimal flags**. Check the [idea backlog](https://github.com/CaporalDead/qrcli/issues/5)
+        first — your idea may already be parked there with a rationale.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't you do today? Describe the need, not the flag you want.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including "do nothing" and doing it outside qrcli (pipe, wrapper script…).

@@ -1,0 +1,33 @@
+name: "Bug report"
+description: "Something misbehaves"
+labels: ["bug"]
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact command line and input. Pipe? Terminal emulator? Light or dark theme?
+      placeholder: |
+        $ qrcli -l H "payload"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: qrcli version
+      description: Output of `qrcli --version`
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: OS/arch, terminal emulator, install method (release binary / go install / nix)
+    validations:
+      required: true
