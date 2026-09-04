@@ -1,0 +1,50 @@
+version: 2
+project_name: qrcli
+
+builds:
+  - main: ./cmd/qrcli
+    binary: qrcli
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    mod_timestamp: '{{ .CommitTimestamp }}'
+
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^chore'
+      - '^Merge'
+  groups:
+    - title: Features
+      regexp: '^feat'
+      order: 0
+    - title: Fixes
+      regexp: '^fix'
+      order: 1
+    - title: Documentation
+      regexp: '^docs'
+      order: 2
+    - title: Other
+      order: 999
+
+release:
+  footer: |
+    ---
+    Binaries are fully static (`CGO_ENABLED=0`) — they run on any Linux
+    including NixOS, macOS and Windows without dependencies.
+    Full decision log: https://github.com/CaporalDead/qrcli/issues?q=label%3Adecision
