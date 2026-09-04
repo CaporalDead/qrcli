@@ -23,6 +23,13 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+        env:
+          # setup-go pins GOTOOLCHAIN=local to our go.mod version, but the
+          # latest govulncheck may require a newer toolchain (v1.7.0 needs
+          # go >= 1.25 while we build with 1.24). Let Go fetch what the
+          # scanner needs, for this step only — the module itself keeps
+          # building with the go.mod toolchain everywhere else.
+          GOTOOLCHAIN: auto
 
   fuzz-smoke:
     runs-on: ubuntu-latest
