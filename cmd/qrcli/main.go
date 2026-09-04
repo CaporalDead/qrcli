@@ -94,7 +94,8 @@ Usage:
 
 Options:
   --name <full name>   display name (required); the last word is used as
-                       the family name when saving the contact
+                       the family name — write "Family, Given" to set it
+                       explicitly
   --tel <number>       phone number
   --email <address>    email address
   --org <name>         organization

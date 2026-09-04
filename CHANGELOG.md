@@ -12,6 +12,11 @@ CLI surface: flags, arguments, exit codes and the output contract.
 - `--version` now reports the real module version for
   `go install .../cmd/qrcli@vX.Y.Z` builds via `debug.ReadBuildInfo`,
   instead of `dev`; ldflags-stamped release binaries are unaffected ([#26]).
+- `wifi`: SSIDs and passwords made solely of hex digits are now
+  double-quoted in the payload, so strict parsers don't misread them as
+  hex-encoded (ZXing recommendation) ([#25]).
+- `vcard`: `--name "Family, Given"` now maps the family name correctly
+  instead of splitting on the last word ([#25]).
 
 ### Security
 
@@ -63,6 +68,7 @@ CLI surface: flags, arguments, exit codes and the output contract.
 [#1]: https://github.com/CaporalDead/qrcli/issues/1
 [#15]: https://github.com/CaporalDead/qrcli/issues/15
 [#22]: https://github.com/CaporalDead/qrcli/issues/22
+[#25]: https://github.com/CaporalDead/qrcli/issues/25
 [#26]: https://github.com/CaporalDead/qrcli/issues/26
 [#17]: https://github.com/CaporalDead/qrcli/issues/17
 [#2]: https://github.com/CaporalDead/qrcli/issues/2
