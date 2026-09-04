@@ -1,0 +1,19 @@
+# Build artifacts
+/qrcli
+/qrcli.exe
+/dist/
+coverage.out
+
+# Nix build outputs
+/result
+/result-*
+.direnv/
+
+# Local AI assistant overrides (the canonical, committed AI guide is AGENTS.md)
+CLAUDE.md
+.claude/settings.local.json
+
+# Editors
+.idea/
+.vscode/
+*.swp
