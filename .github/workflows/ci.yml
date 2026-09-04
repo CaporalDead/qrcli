@@ -39,3 +39,15 @@ jobs:
       - uses: golangci/golangci-lint-action@v8
         with:
           version: latest
+
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      # buildGoModule runs the test suite as part of the build.
+      - run: nix build .#qrcli --print-build-logs
+      - name: smoke test
+        run: |
+          ./result/bin/qrcli --version
+          ./result/bin/qrcli "nix ci smoke test"
