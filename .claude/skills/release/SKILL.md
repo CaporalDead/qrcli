@@ -33,8 +33,10 @@ git push origin vX.Y.Z
 
 - `gh run watch $(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId') --exit-status`
 - `gh release view vX.Y.Z --json assets -q '.assets[].name'` → expect 6 archives
-  + `checksums.txt` (linux/darwin/windows × amd64/arm64).
+  (linux/darwin/windows × amd64/arm64) + 6 `.sbom.json` + `checksums.txt`.
 - Smoke-test one asset: download, extract, `./qrcli --version` must print vX.Y.Z.
+- **Provenance**: `gh attestation verify <downloaded archive> --repo CaporalDead/qrcli`
+  must succeed (issue #23).
 - `nix run github:CaporalDead/qrcli/vX.Y.Z -- "release smoke"` renders a QR.
 
 ## 5. Aftercare

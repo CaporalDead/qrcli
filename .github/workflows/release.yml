@@ -1,27 +1,43 @@
 name: Release
 
+# Actions are pinned to commit SHAs (supply-chain hardening, issue #23).
+
 on:
   push:
     tags: ['v*.*.*']
 
 permissions:
   contents: write
+  # For the build-provenance attestation.
+  id-token: write
+  attestations: write
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # GoReleaser needs the full history to build the changelog.
           fetch-depth: 0
-      - uses: actions/setup-go@v7
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
           go-version-file: go.mod
-      - uses: goreleaser/goreleaser-action@v7
+      # syft is required by the sboms section of .goreleaser.yaml.
+      - uses: anchore/sbom-action/download-syft@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+      - uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7
         with:
           distribution: goreleaser
           version: '~> v2'
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Publishes a verifiable build-provenance attestation for every
+      # archive: `gh attestation verify <asset> --repo CaporalDead/qrcli`.
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt

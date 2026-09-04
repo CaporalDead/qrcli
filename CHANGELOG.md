@@ -20,6 +20,10 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 ### Security
 
+- Releases now ship a build-provenance attestation
+  (`gh attestation verify <asset> --repo CaporalDead/qrcli`) and one SPDX
+  SBOM per archive; CI actions are pinned to commit SHAs and a weekly lane
+  runs `govulncheck` plus a fuzz smoke ([#23]).
 - Standard-input ingestion is now bounded: streams beyond the maximum QR
   capacity (2953 bytes) fail fast with constant memory, instead of being
   buffered whole (a 200 MB pipe was measured at 787 MB peak RSS) before the
@@ -68,6 +72,7 @@ CLI surface: flags, arguments, exit codes and the output contract.
 [#1]: https://github.com/CaporalDead/qrcli/issues/1
 [#15]: https://github.com/CaporalDead/qrcli/issues/15
 [#22]: https://github.com/CaporalDead/qrcli/issues/22
+[#23]: https://github.com/CaporalDead/qrcli/issues/23
 [#25]: https://github.com/CaporalDead/qrcli/issues/25
 [#26]: https://github.com/CaporalDead/qrcli/issues/26
 [#17]: https://github.com/CaporalDead/qrcli/issues/17
