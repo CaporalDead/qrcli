@@ -92,6 +92,61 @@ func TestRun(t *testing.T) {
 			wantCode:     0,
 			wantInStdout: "█",
 		},
+		{
+			name:         "wifi missing ssid",
+			args:         []string{"wifi"},
+			wantCode:     2,
+			wantInStderr: "--ssid is required",
+		},
+		{
+			name:         "wifi help",
+			args:         []string{"wifi", "-h"},
+			wantCode:     0,
+			wantInStderr: "qrcli wifi",
+		},
+		{
+			name:         "wifi unexpected positional",
+			args:         []string{"wifi", "--ssid", "x", "--pass", "p", "oops"},
+			wantCode:     2,
+			wantInStderr: "unexpected argument",
+		},
+		{
+			name:         "wifi pass conflicts with nopass",
+			args:         []string{"wifi", "--ssid", "x", "--pass", "p", "--type", "nopass"},
+			wantCode:     2,
+			wantInStderr: "conflicts",
+		},
+		{
+			name:         "wifi with render flags",
+			args:         []string{"wifi", "--ssid", "x", "--pass", "p", "-l", "H", "-i"},
+			wantCode:     0,
+			wantInStdout: "█",
+		},
+		{
+			name:         "vcard missing name",
+			args:         []string{"vcard"},
+			wantCode:     2,
+			wantInStderr: "--name is required",
+		},
+		{
+			name:         "vcard help",
+			args:         []string{"vcard", "-h"},
+			wantCode:     0,
+			wantInStderr: "qrcli vcard",
+		},
+		{
+			name:         "subcommand name after flags fails loudly",
+			args:         []string{"-i", "wifi", "--ssid", "x"},
+			wantCode:     2,
+			wantInStderr: "subcommand",
+		},
+		{
+			name:         "literal subcommand word still works via stdin",
+			args:         nil,
+			stdin:        "wifi",
+			wantCode:     0,
+			wantInStdout: "█",
+		},
 	}
 
 	for _, tt := range tests {
@@ -144,6 +199,43 @@ func TestASCIIComposesWithInvert(t *testing.T) {
 	}
 	if utf8.RuneCountInString(normal) != utf8.RuneCountInString(inverted) {
 		t.Error("invert must not change ascii output dimensions")
+	}
+}
+
+func TestWiFiSubcommandMatchesRawPayload(t *testing.T) {
+	// The subcommand is sugar over the documented raw format: both must
+	// render byte-identically (equivalence pinned by issue #17).
+	code, fromSub, _ := exec(t, []string{"wifi", "--ssid", "Home", "--pass", "hunter2"}, "")
+	if code != 0 {
+		t.Fatalf("exit code = %d, want 0", code)
+	}
+	_, fromRaw, _ := exec(t, []string{"WIFI:T:WPA;S:Home;P:hunter2;;"}, "")
+	if fromSub != fromRaw {
+		t.Error("wifi subcommand and raw WIFI: payload rendered different codes")
+	}
+}
+
+func TestVCardSubcommandMatchesRawPayload(t *testing.T) {
+	code, fromSub, _ := exec(t, []string{"vcard", "--name", "Ada Lovelace", "--email", "ada@example.org"}, "")
+	if code != 0 {
+		t.Fatalf("exit code = %d, want 0", code)
+	}
+	raw := "BEGIN:VCARD\nVERSION:3.0\nN:Lovelace;Ada\nFN:Ada Lovelace\nEMAIL:ada@example.org\nEND:VCARD"
+	_, fromRaw, _ := exec(t, []string{raw}, "")
+	if fromSub != fromRaw {
+		t.Error("vcard subcommand and raw vCard payload rendered different codes")
+	}
+}
+
+func TestSubcommandASCIIMode(t *testing.T) {
+	_, out, _ := exec(t, []string{"wifi", "--ssid", "x", "--pass", "y", "-a"}, "")
+	if !strings.Contains(out, "#") {
+		t.Error("ascii output should contain '#'")
+	}
+	for _, r := range out {
+		if r > 127 {
+			t.Fatalf("ascii output contains non-ASCII rune %q", r)
+		}
 	}
 }
 

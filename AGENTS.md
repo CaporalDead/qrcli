@@ -9,7 +9,9 @@ way, and leave the knowledge base richer than you found it.
 ## Project map
 
 ```
-cmd/qrcli/        CLI surface: flags, input (args|stdin), exit codes, version
+cmd/qrcli/        CLI surface: subcommand dispatch (wifi, vcard), flags,
+                  input (args|stdin), exit codes, version
+internal/payload/ pure payload builders (WIFI:, vCard 3.0) with escaping
 internal/render/  pure [][]bool → string half-block renderer (no ANSI)
 .github/          CI (test matrix + lint + nix), release (GoReleaser on tags)
 flake.nix         Nix package + devShell (NixOS is a first-class target)
@@ -38,6 +40,11 @@ truth for toolchain versions.
 - **Renderer stays pure**: `internal/render` must remain side-effect-free —
   that's what makes exact-string testing possible.
 - Rendered-output assertions count **runes**, never bytes (`█` is 3 bytes).
+- Subcommand names reserve first-argument words (currently `wifi`, `vcard`);
+  adding one is a behavior change that needs its own ADR and a *Changed*
+  changelog entry, and stdin must remain the literal-text escape hatch (#17).
+- Every payload subcommand must stay byte-equivalent to its documented raw
+  format — pinned by equivalence tests in `cmd/qrcli`.
 - `flake.nix` gotchas: bump `vendorHash` when `go.mod`/`go.sum` change
   (build with a fake hash, copy the `got:` value); `nix build` only sees
   **git-tracked** files — `git add` new files before diagnosing "missing file".
