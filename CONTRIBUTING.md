@@ -44,6 +44,11 @@ $ make fmt      # gofmt + go mod tidy
 5. **CI must be green** (test matrix, lint, nix). PRs are **squash-merged**, so
    the PR title becomes the conventional commit on `main`.
 
+`main` is protected: the five CI checks are required, branches must be up to
+date, direct pushes are disabled (PRs only, maintainers included) and history
+is linear (squash is the only enabled merge method). Repository admins can
+bypass in emergencies — doing so warrants a `pitfall` issue explaining why.
+
 The full checklist lives in [docs/definition-of-done.md](docs/definition-of-done.md).
 
 ## What lands, what doesn't
