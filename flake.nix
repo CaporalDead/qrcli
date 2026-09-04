@@ -8,7 +8,7 @@
       systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
       # Keep in sync with the git tag when releasing (see the release runbook).
-      version = "0.1.0";
+      version = "0.2.0";
     in
     {
       packages = forAllSystems (pkgs: rec {

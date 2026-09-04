@@ -7,6 +7,8 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-05
+
 ### Added
 
 - `-a/--ascii`: pure 7-bit ASCII rendering (`##`), a fallback for terminals
@@ -45,5 +47,6 @@ CLI surface: flags, arguments, exit codes and the output contract.
 [#2]: https://github.com/CaporalDead/qrcli/issues/2
 [#3]: https://github.com/CaporalDead/qrcli/issues/3
 [#4]: https://github.com/CaporalDead/qrcli/issues/4
-[Unreleased]: https://github.com/CaporalDead/qrcli/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/CaporalDead/qrcli/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/CaporalDead/qrcli/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/CaporalDead/qrcli/releases/tag/v0.1.0
