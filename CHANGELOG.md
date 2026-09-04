@@ -11,6 +11,18 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 - `-a/--ascii`: pure 7-bit ASCII rendering (`##`), a fallback for terminals
   without Unicode block glyphs; composes with `-i/--invert` ([#15]).
+- `wifi` subcommand: encode Wi-Fi credentials (`--ssid`, `--pass`, `--type`,
+  `--hidden`) in the standard `WIFI:` format with proper escaping ([#17]).
+- `vcard` subcommand: encode a vCard 3.0 contact card (`--name`, `--tel`,
+  `--email`, `--org`, `--url`) with proper escaping ([#17]).
+- Rendering flags (`-l`, `-i`, `-a`) are accepted after a subcommand.
+
+### Changed
+
+- The words `wifi` and `vcard` are now reserved as first argument (subcommand
+  dispatch). To encode those literal words, pipe them on stdin
+  (`echo -n wifi | qrcli`); a subcommand name appearing after flags is a loud
+  usage error instead of silently joining the payload ([#17]).
 
 ## [0.1.0] - 2026-09-04
 
@@ -29,6 +41,7 @@ CLI surface: flags, arguments, exit codes and the output contract.
 
 [#1]: https://github.com/CaporalDead/qrcli/issues/1
 [#15]: https://github.com/CaporalDead/qrcli/issues/15
+[#17]: https://github.com/CaporalDead/qrcli/issues/17
 [#2]: https://github.com/CaporalDead/qrcli/issues/2
 [#3]: https://github.com/CaporalDead/qrcli/issues/3
 [#4]: https://github.com/CaporalDead/qrcli/issues/4

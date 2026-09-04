@@ -14,9 +14,14 @@ flowchart LR
     end
 
     subgraph cmd [cmd/qrcli]
+        D["subcommand dispatch<br/>(wifi / vcard / raw)"]
         P["flag parsing<br/>(stdlib flag)"]
         I["input()<br/>args or stdin"]
         E["exit-code mapping"]
+    end
+
+    subgraph pay [internal/payload]
+        W["WiFi / VCard builders<br/>format escaping<br/>pure functions"]
     end
 
     subgraph deps [github.com/skip2/go-qrcode]
@@ -30,8 +35,9 @@ flowchart LR
     O[(stdout<br/>plain UTF-8)]
     ERR[(stderr<br/>diagnostics)]
 
-    A --> P --> I
+    A --> D --> P --> I
     S --> I
+    D -. "wifi / vcard" .-> W --> Q
     I --> Q --> R --> O
     P -. "usage / errors" .-> ERR
     Q -. "encode errors" .-> ERR
@@ -42,7 +48,8 @@ Separation of concerns:
 
 | Package | Responsibility | Testing strategy |
 |---|---|---|
-| `cmd/qrcli` | CLI surface: flags, input selection, exit codes, version | `run()` takes injected `io.Reader`/`io.Writer` — table-driven integration tests without executing a binary |
+| `cmd/qrcli` | CLI surface: subcommand dispatch, flags, input selection, exit codes, version | `run()` takes injected `io.Reader`/`io.Writer` — table-driven integration tests without executing a binary |
+| `internal/payload` | Pure field-struct → payload-string builders (WIFI:, vCard 3.0) with per-format escaping | exact-string table-driven tests + CLI equivalence tests (subcommand ≡ raw payload) |
 | `internal/render` | Pure `[][]bool → string` mapping (half-blocks, quiet zone, polarity) | exact-string table-driven tests |
 | `skip2/go-qrcode` | QR encoding (versions, masks, Reed-Solomon) | not ours — treated as a black box |
 
@@ -134,4 +141,5 @@ The issue tracker is the source of truth; this table is just the map.
 | CI matrix, GoReleaser, SemVer & Conventional Commits policy | [#3](https://github.com/CaporalDead/qrcli/issues/3) |
 | Nix flake, vendorHash & git-tracked-files pitfalls | [#4](https://github.com/CaporalDead/qrcli/issues/4), [PR #13](https://github.com/CaporalDead/qrcli/pull/13) |
 | `--ascii` fallback renderer (`##`, graduated from the backlog) | [#15](https://github.com/CaporalDead/qrcli/issues/15) |
+| `wifi`/`vcard` subcommands, reserved first args, vCard 3.0 over MECARD | [#17](https://github.com/CaporalDead/qrcli/issues/17) |
 | Rejected/parked ideas (image export, payload helpers…) | [#5](https://github.com/CaporalDead/qrcli/issues/5) |

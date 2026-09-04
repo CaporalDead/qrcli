@@ -70,6 +70,8 @@ $ go install github.com/CaporalDead/qrcli/cmd/qrcli@latest
 ```text
 qrcli [options] <text>
 <command> | qrcli [options]
+qrcli wifi --ssid <name> [--pass <secret>] [options]
+qrcli vcard --name <full name> [options]
 
   -l, --level L|M|Q|H  error correction level (default M)
   -i, --invert         invert colors, for light terminal backgrounds
@@ -85,10 +87,29 @@ $ qrcli "https://example.org"                    # share a URL
 $ echo -n "some secret" | qrcli                  # pipe from stdin
 $ qrcli -l H "survives 30% damage"               # highest error correction
 $ qrcli -i "hello"                               # on a light terminal theme
-$ qrcli "WIFI:T:WPA;S:MyNetwork;P:hunter2;;"     # Wi-Fi credentials
+$ qrcli "WIFI:T:WPA;S:MyNetwork;P:hunter2;;"     # raw payloads work too
 $ qrcli -a "hello"                               # 7-bit ASCII (##), no Unicode
 $ qrcli -- "-starts-with-a-dash"                 # payload starting with '-'
 ```
+
+### Payload helpers
+
+Common formats have subcommands so you don't have to remember their escaping
+rules — special characters in SSIDs, passwords and contact fields are escaped
+for you:
+
+```console
+$ qrcli wifi --ssid "Home" --pass "hunter2"            # WPA by default
+$ qrcli wifi --ssid "Café du Coin" --hidden --pass x   # hidden network
+$ qrcli wifi --ssid "FreeSpot"                         # open network
+$ qrcli vcard --name "Ada Lovelace" --tel "+44 20 7946 0958" \
+              --email ada@example.org --org "Analytical Engines Ltd"
+```
+
+`qrcli wifi -h` / `qrcli vcard -h` list all fields. Rendering options
+(`-l`, `-i`, `-a`) go **after** the subcommand. The words `wifi` and `vcard`
+are reserved as first argument — to encode those literal words, pipe them
+instead: `echo -n "wifi" | qrcli`.
 
 Error correction levels trade capacity for damage resistance:
 `L` ≈ 7 %, `M` ≈ 15 % (default), `Q` ≈ 25 %, `H` ≈ 30 % of the code may be
