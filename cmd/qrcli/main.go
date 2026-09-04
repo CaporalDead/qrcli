@@ -28,6 +28,14 @@ var version = "dev"
 // spec-mandated 4.
 const quietZone = 2
 
+// maxPayload is the byte capacity of the largest QR code (version 40,
+// level L, byte mode). Anything longer can be rejected before buffering
+// or encoding — the bound that keeps stdin ingestion constant-memory
+// (issue #22).
+const maxPayload = 2953
+
+var errTooLong = fmt.Errorf("input exceeds the maximum QR capacity (%d bytes)", maxPayload)
+
 const usage = `qrcli — generate QR codes in your terminal
 
 Usage:
@@ -277,6 +285,9 @@ func input(args []string, stdin io.Reader) (string, error) {
 		if text == "" {
 			return "", errors.New("empty input")
 		}
+		if len(text) > maxPayload {
+			return "", errTooLong
+		}
 		return text, nil
 	}
 
@@ -286,7 +297,11 @@ func input(args []string, stdin io.Reader) (string, error) {
 		}
 	}
 
-	data, err := io.ReadAll(stdin)
+	// Read at most maxPayload plus room for a trailing newline ("\r\n")
+	// plus one sentinel byte: any stream that fills the limit is over
+	// capacity even after stripping the newline, so nothing is ever
+	// silently truncated and memory stays constant on huge pipes.
+	data, err := io.ReadAll(io.LimitReader(stdin, maxPayload+3))
 	if err != nil {
 		return "", fmt.Errorf("reading stdin: %w", err)
 	}
@@ -294,6 +309,9 @@ func input(args []string, stdin io.Reader) (string, error) {
 	text = strings.TrimSuffix(text, "\r")
 	if text == "" {
 		return "", errors.New("empty input")
+	}
+	if len(text) > maxPayload {
+		return "", errTooLong
 	}
 	return text, nil
 }
